@@ -1,11 +1,13 @@
 mod player;
+mod window;
 
 use std::{path::PathBuf, time::Duration};
 use ggez::{
-	conf, event::{self, EventHandler}, glam::Vec2, graphics, winit::window::WindowButtons, Context, ContextBuilder, GameError, GameResult
+	conf, event::{self, EventHandler}, glam::Vec2, graphics, winit::{monitor::MonitorHandle, window::{Window, WindowButtons}}, Context, ContextBuilder, GameError, GameResult
 };
 
 use player::Player;
+use window::center_window_to_screen;
 
 struct MyGame {
 	delta_time: Duration,
@@ -35,6 +37,9 @@ impl EventHandler<GameError> for MyGame {
 		self.player_instance.update_movement(ctx, delta_time_s);
 		self.player_instance.rotate_facing(mouse_pos_vec2);
 
+        // let size = self.temp.current_monitor().unwrap();
+        // println!("{}, {}", size.width, size.height);
+
 		Ok(())
 	}
 	fn draw(&mut self, ctx: &mut Context) -> GameResult {
@@ -55,7 +60,8 @@ impl EventHandler<GameError> for MyGame {
 }
 
 pub fn main() {
-	let assets_dir = PathBuf::from("./assets");
+	// std::env::set_var("RUST_BACKTRACE", "1");
+    let assets_dir = PathBuf::from("./assets");
 
 	let c = conf::Conf::new();
 	let (mut ctx, event_loop) = ContextBuilder::new("glowy", "SilentDreamer")
@@ -69,10 +75,12 @@ pub fn main() {
 		.build()
 		.unwrap();
 
-	let window_ref = ctx.gfx.window();
+	let win = ctx.gfx.window();
 	let mut buttons = WindowButtons::all();
 	buttons.remove(WindowButtons::MAXIMIZE);
-	window_ref.set_enabled_buttons(buttons);
+	win.set_enabled_buttons(buttons);
+
+    center_window_to_screen(win);
 
 	let my_game = MyGame::new(&mut ctx).unwrap();
 	event::run(ctx, event_loop, my_game);
