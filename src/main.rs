@@ -60,7 +60,7 @@ impl EventHandler<GameError> for MyGame {
 }
 
 pub fn main() {
-	// std::env::set_var("RUST_BACKTRACE", "1");
+	let is_bake_cache_enabled = false;
     let assets_dir = PathBuf::from("./assets");
 
 	let c = conf::Conf::new();
